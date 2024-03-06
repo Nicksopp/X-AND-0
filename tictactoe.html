@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f1f1f1;
+    }
+
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 5px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      text-align: center;
+      line-height: 100px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      background-color: #ddd;
+    }
+
+    #players {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #result {
+      text-align: center;
+      font-size: 20px;
+      margin-top: 20px;
+    }
+  </style>
+  <title>Tic Tac Toe</title>
+</head>
+<body>
+  <div id="players">
+    <label for="player1">Player 1:</label>
+    <input type="text" id="player1" placeholder="Enter name">
+
+    <label for="player2">Player 2:</label>
+    <input type="text" id="player2" placeholder="Enter name">
+
+    <button onclick="startGame()">Start Game</button>
+  </div>
+
+  <div id="game-board"></div>
+
+  <div id="result"></div>
+
+  <script>
+    let currentPlayer = 'X';
+    let player1Name = '';
+    let player2Name = '';
+    let gameBoard = ['', '', '', '', '', '', '', '', ''];
+    let gameActive = false;
+
+    function startGame() {
+      player1Name = document.getElementById('player1').value;
+      player2Name = document.getElementById('player2').value;
+
+      if (player1Name && player2Name) {
+        gameActive = true;
+        currentPlayer = 'X';
+        document.getElementById('players').style.display = 'none';
+        document.getElementById('game-board').innerHTML = '';
+        document.getElementById('result').innerHTML = '';
+
+        for (let i = 0; i < 9; i++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          cell.setAttribute('data-index', i);
+          cell.addEventListener('click', () => makeMove(i));
+          document.getElementById('game-board').appendChild(cell);
+        }
+      } else {
+        alert('Please enter names for both players.');
+      }
+    }
+
+    function makeMove(index) {
+      if (gameBoard[index] === '' && gameActive) {
+        gameBoard[index] = currentPlayer;
+        document.querySelector(`[data-index="${index}"]`).innerText = currentPlayer;
+
+        if (checkWinner()) {
+          document.getElementById('result').innerText = currentPlayer === 'X' ? `${player1Name} wins!` : `${player2Name} wins!`;
+          gameActive = false;
+        } else if (gameBoard.every(cell => cell !== '')) {
+          document.getElementById('result').innerText = 'It\'s a draw!';
+          gameActive = false;
+        } else {
+          currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        }
+      }
+    }
+
+    function checkWinner() {
+      const winningCombinations = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6]             // Diagonals
+      ];
+
+      return winningCombinations.some(combination =>
+        combination.every(index => gameBoard[index] === currentPlayer)
+      );
+    }
+  </script>
+</body>
+</html>
